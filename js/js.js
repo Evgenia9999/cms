@@ -42,7 +42,7 @@ const createRow = (object) => {
     tr.insertAdjacentElement('beforeend', td7);
     tr.insertAdjacentElement('beforeend', td8);
 
-    td1.insertAdjacentHTML('beforeend', `${object.num}`);
+    let num = td1.insertAdjacentHTML('beforeend', '');
     td1.classList.add('table__cell');
 
     td2.classList.add('table__cell', 'table__cell_left', 'table__cell_name');
@@ -61,12 +61,15 @@ const createRow = (object) => {
 
     td5.classList.add('table__cell');
     td5.insertAdjacentHTML('beforeend', `${object.count}`);
+    const count = td5.innerHTML;
 
     td6.classList.add('table__cell');
     td6.insertAdjacentHTML('beforeend', `${object.price}`);
+    const price = td6.innerHTML;
 
     td7.classList.add('table__cell');
-    td7.insertAdjacentHTML('beforeend', `${object.priceSum}`);
+    const priceSum = count * price;
+    td7.insertAdjacentText('beforeend', priceSum);
 
     td8.classList.add('table__cell', 'table__cell_btn-wrapper');
     const button1 = document.createElement('button');
@@ -80,14 +83,27 @@ const createRow = (object) => {
     button3.classList.add('table__btn', 'table__btn_del');
 
     console.log('tr: ', tr);
-}
-createRow (obj);
+
+    const tBody = document.querySelector('tbody');
+    tBody.insertAdjacentElement('beforeend', tr);
+
+    const itemNumFoo = () => {
+      const previousTr = tr.previousElementSibling;
+      const previousTd = previousTr.querySelector('.table__cell').innerHTML;
+      const itemNum = +previousTd + 1;
+    
+      return td1.insertAdjacentText('beforeend', itemNum);
+    };
+    itemNumFoo();
+
+    return tr;
+};
 
 const renderGoods = (arr) => {
 
-return arr.forEach((element) => createRow (element)); 
+return arr.map((element) => createRow (element)); 
 
-}
+};
 
 
 const goodsArr = [
@@ -149,4 +165,14 @@ const goodsArr = [
     }
 ]
 
+
+const init = () => {
 renderGoods(goodsArr);
+}
+
+init();
+
+
+
+
+
