@@ -1,28 +1,28 @@
 'use strict';
 
-const data = [
-    {
-      name: 'Иван',
-      surname: 'Петров',
-      phone: '+79514545454',
-    },
-    {
-      name: 'Игорь',
-      surname: 'Семёнов',
-      phone: '+79999999999',
-    },
-    {
-      name: 'Семён',
-      surname: 'Иванов',
-      phone: '+79800252525',
-    },
-    {
-      name: 'Мария',
-      surname: 'Попова',
-      phone: '+79876543210',
-    },
-  ];
 
+const data = [
+  {
+    name: 'Иван',
+    surname: 'Петров',
+    phone: '+79514545454',
+  },
+  {
+    name: 'Игорь',
+    surname: 'Семёнов',
+    phone: '+79999999999',
+  },
+  {
+    name: 'Семён',
+    surname: 'Иванов',
+    phone: '+79800252525',
+  },
+  {
+    name: 'Мария',
+    surname: 'Попова',
+    phone: '+79876543210',
+  },
+];
 {
   const createContainer = () => {
     const container = document.createElement('div');
@@ -48,7 +48,7 @@ const data = [
     footer.append(footerContainer);
     footer.footerContainer = footerContainer;
 
-    const footerLogo = document.createElement('footerLogo6');
+    const footerLogo = document.createElement('footerLogo');
     footerLogo.textContent = 'Все права защищены. Евгения.';
     footerContainer.append(footerLogo);
 
@@ -71,7 +71,7 @@ const data = [
 
     return main;
   };
-  
+
   const createButtonGroup = param => {
     const btnWrapper = document.createElement('div');
     btnWrapper.classList.add('btn-wrapper');
@@ -113,12 +113,12 @@ const data = [
   }
 
   const createForm = () => {
-const overlay = document.createElement('div');
-overlay.classList.add('form-overlay');
+    const overlay = document.createElement('div');
+    overlay.classList.add('form-overlay');
 
-const form = document.createElement('form');
-form.classList.add('form');
-form.insertAdjacentHTML('beforeend', `
+    const form = document.createElement('form');
+    form.classList.add('form');
+    form.insertAdjacentHTML('beforeend', `
   <button class="close" type="button"></button>
   <h class="form-title"2></h>
   <div class="form-group">
@@ -165,7 +165,7 @@ form.insertAdjacentHTML('beforeend', `
     const footer = createFooter();
     const buttonGroup = createButtonGroup([
       {
-        className: 'btn btn-primary mr-3',
+        className: 'btn btn-primary mr-3 js-add',
         type: 'button',
         text: 'Добавить',
       },
@@ -184,6 +184,11 @@ form.insertAdjacentHTML('beforeend', `
 
     return {
       list: table.tbody,
+      logo,
+      btnAdd: buttonGroup.btns[0],
+      formOverlay: form.overlay,
+      form: form.form,
+
     };
   };
   const createRow = ({name: firstName, surname, phone}) => {
@@ -201,15 +206,23 @@ form.insertAdjacentHTML('beforeend', `
     const tdSurname = document.createElement('td');
     tdSurname.textContent = surname;
 
-
     const tdPhone = document.createElement('td');
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    tr.phoneLink = phoneLink;
+    tdPhone.append(phoneLink);
 
     tdPhone.append(phoneLink);
 
     tr.append(tdDel, tdName, tdSurname, tdPhone);
+
+    const tdEdit = document.createElement('td');
+    const buttonEdit = document.createElement('button');
+    buttonEdit.classList.add('edit-icon');
+    tdEdit.append(buttonEdit);
+
+    tr.append(buttonEdit);
 
     return tr;
   };
@@ -217,16 +230,46 @@ form.insertAdjacentHTML('beforeend', `
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
+    return allRow;
+  };
+
+  const hoverRow = (allRow, logo) => {
+    const text = logo.textContent;
+
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseenter', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+    });
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    });
   };
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list} = phoneBook;
+    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
 
-    renderContacts(list, data);
     // функционал
+    const allRow = renderContacts(list, data);
+
+    hoverRow(allRow, logo);
+
+    btnAdd.addEventListener('click', () => {
+      formOverlay.classList.add('is-visible');
+    });
+
+    form.addEventListener('click', event => {
+      event.stopPropagation();
+    });
+
+    formOverlay.addEventListener('click', () => {
+      formOverlay.classList.remove('is-visible');
+    });
   };
 
   window.phoneBookInit = init;
