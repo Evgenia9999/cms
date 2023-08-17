@@ -9,17 +9,6 @@ const fieldCheckbox = document.querySelector('.modal__input.modal__input_discoun
 const overlayElem = document.querySelector('.overlay');
 overlayElem.classList.remove('active');
 
-const obj = {
-num: 2,
-id: 24601654816512,
-title: "Телевизор DEXP",
-category: "Техника для дома",
-units: "шт",
-count: 15,
-price: "$1000",
-priceSum: "$15000",
-};
-
 const goodsArr = [
   {
     "id": 1,
@@ -92,14 +81,7 @@ const createRow = ({id, title, category, units, count, price}) => {
     const itemSum = document.createElement('td');
     const buttons = document.createElement('td');
 
-    tr.append(itemNumber);
-    tr.append(itemName);
-    tr.append(itemCategory);
-    tr.append(itemUnits);
-    tr.append(itemCount);
-    tr.append(itemPrice);
-    tr.append(itemSum);
-    tr.append(buttons);
+    tr.append(itemNumber, itemName, itemCategory, itemUnits, itemCount, itemPrice, itemSum, buttons);
 
     let num = itemNumber.insertAdjacentHTML('beforeend', '');
     itemNumber.classList.add('table__cell');
@@ -134,9 +116,7 @@ const createRow = ({id, title, category, units, count, price}) => {
     const button1 = document.createElement('button');
     const button2 = document.createElement('button');
     const button3 = document.createElement('button');
-    buttons.append(button1);
-    buttons.append(button2);
-    buttons.append(button3);
+    buttons.append(button1, button2, button3);
     button1.classList.add('table__btn', 'table__btn_pic');
     button2.classList.add('table__btn', 'table__btn_edit');
     button3.classList.add('table__btn', 'table__btn_del');
