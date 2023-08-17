@@ -166,6 +166,33 @@ return arr.map((element) => createRow (element));
 
 const init = () => {
 renderGoods(goodsArr);
+
+const addItemBtn = () => {
+const addItemButton = document.querySelector('.panel__add-goods');
+const formField = document.querySelector('.overlay__modal.modal')
+const exitForm = document.querySelector('.modal__close');
+
+addItemButton.addEventListener('click', () => {
+  overlayElem.classList.add('active');
+});
+
+formField.addEventListener('click', e => {
+  e.stopPropagation();
+});
+
+overlayElem.addEventListener('click', () => {
+  overlayElem.classList.remove('active');
+});
+
+exitForm.addEventListener('click', () => {
+  overlayElem.classList.remove('active');
+});
+
+
+}
+addItemBtn();
+
+
 }
 
 init();
@@ -174,3 +201,6 @@ init();
 
 
 
+// 1. При нажатии на кнопку "Добавить товар", открывать модальное окно 
+
+// 2. При нажатии на крестик или мимо модального окна, закрывать его
