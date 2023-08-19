@@ -108,9 +108,10 @@ const data = [
     const tbody = document.createElement('tbody');
     table.append(thead, tbody);
     table.tbody = tbody;
-    
+    table.thead = thead;
+
     return table;
-  }
+  };
 
   const createForm = () => {
     const overlay = document.createElement('div');
@@ -157,7 +158,6 @@ const data = [
       form,
     };
   };
-
   const renderPhoneBook = (app, title) => {
     const header = createHeader();
     const logo = createLogo(title);
@@ -186,13 +186,16 @@ const data = [
       list: table.tbody,
       logo,
       btnAdd: buttonGroup.btns[0],
+      btnDel: buttonGroup.btns[1],
       formOverlay: form.overlay,
       form: form.form,
+      tName: table.thead,
 
     };
   };
   const createRow = ({name: firstName, surname, phone}) => {
     const tr = document.createElement('tr');
+    tr.classList.add('contact');
 
     const tdDel = document.createElement('td');
     tdDel.classList.add('delete');
@@ -252,7 +255,15 @@ const data = [
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhoneBook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
+    const {
+      list,
+      logo,
+      btnAdd,
+      formOverlay,
+      form,
+      btnDel,
+      tName,
+    } = phoneBook;
 
     // функционал
     const allRow = renderContacts(list, data);
@@ -263,13 +274,45 @@ const data = [
       formOverlay.classList.add('is-visible');
     });
 
-    form.addEventListener('click', event => {
-      event.stopPropagation();
+    formOverlay.addEventListener('click', e => {
+      const target = e.target;
+      if (target === formOverlay ||
+        target.classList.contains('close')) {
+        formOverlay.classList.remove('is-visible');
+      }
     });
 
-    formOverlay.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    btnDel.addEventListener('click', () => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      });
     });
+
+    list.addEventListener('click', e => {
+      const target = e.target;
+      if (e.target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
+    });
+
+    const headName = tName.querySelectorAll('th');
+    tName.addEventListener('click', e => {
+      const target = e.target;
+      if (target === headName[1]) {
+        allRow.sort((x, y) => x.name.localeCompare(y.name));
+      } else if (target === headName[2]) {
+        allRow.sort((x, y) => x.surname - y.surname);
+      }
+    });
+
+    // setTimeout(() => {
+    //   const contact = createRow({
+    //     name: 'Мария',
+    //     surname: 'Попова',
+    //     phone: '+79876543210',
+    //   });
+    //   list.append(contact);
+    // }, 2000);
   };
 
   window.phoneBookInit = init;
