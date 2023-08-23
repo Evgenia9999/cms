@@ -67,12 +67,11 @@ const goodsArr = [
   }
 ]
 
-const itemNumFoo = (itemNumber, tr) => {
-  const previousTr = tr.previousElementSibling;
-  const previousTd = previousTr.querySelector('.table__cell').innerHTML;
-  const itemNum = +previousTd + 1;
-
-  return itemNumber.append(itemNum);
+const itemNumFoo = () => {
+  const itemNumber = document.querySelectorAll('.row_number')
+  let i = 1
+  itemNumber.forEach(e => e.textContent = 0);
+  itemNumber.forEach(e => e.textContent = i++);
 };
 
 const createRow = ({id, title, category, units, count, price, images}) => {
@@ -91,7 +90,7 @@ const createRow = ({id, title, category, units, count, price, images}) => {
     tr.append(itemNumber, itemName, itemCategory, itemUnits, itemCount, itemPrice, itemSum, buttons);
 
     let num = itemNumber.insertAdjacentHTML('beforeend', '');
-    itemNumber.classList.add('table__cell');
+    itemNumber.classList.add('table__cell', 'row_number');
 
     itemName.classList.add('table__cell', 'table__cell_left', 'table__cell_name');
     itemName.dataset.id = id;
@@ -132,12 +131,7 @@ const createRow = ({id, title, category, units, count, price, images}) => {
     const tBody = document.querySelector('tbody');
     tBody.append(tr);
 
-    itemNumFoo(itemNumber, tr);
-
-    return {
-      tr,
-      tBody,
-    }
+    return tr;
 };
 
 const renderGoods = (arr) => {
@@ -147,6 +141,9 @@ return arr.map((element) => createRow (element));
 };
 
 const deleteRow = () => {
+
+  const tr = document.querySelectorAll('tr');
+  tr.forEach(e => e.classList.add('row'));
   
   const tBody = document.querySelector('.table__body')
   tBody.addEventListener('click', e => {
@@ -154,6 +151,7 @@ const deleteRow = () => {
     if (e.target.closest('.table__btn.table__btn_del')) {
       target.closest('.row').remove();
       foo();
+      itemNumFoo();
     }
   });
   
@@ -203,13 +201,14 @@ const discountControl = () => {
 
 const addItemData = (item) => {
   goodsArr.push(item);
+  console.log('goodsArr: ', goodsArr);
 
 };
 
 const addItemDataPage = (item, tBody) => {
 
 tBody.append(createRow(item));
-addClassToCms();
+itemNumFoo();
 };
 
 const formControl = (form, tBody, closeModal) => {
@@ -217,41 +216,20 @@ form.addEventListener('submit', e => {
   e.preventDefault();
 
   const formData = new FormData(e.target);
-
   const newItem = Object.fromEntries(formData)
+  console.log('newItem: ', newItem);
   newItem.title = newItem.name;
   let idForm = document.querySelector('.vendor-code__id');
   newItem.id = idForm.textContent;
   addItemDataPage(newItem, tBody);
   addItemData(newItem);
+  const tr = document.querySelectorAll('tr');
+  tr.forEach(e => e.classList.add('row'));
   foo();
   form.reset();
   closeModal();
 });
 
-};
-
-const addClassToCms = () => {
-  const tr = document.querySelectorAll('tr');
-  tr.forEach(e => e.classList.add('row'));
-
-  const trRow = document.querySelectorAll('tr');
-
-  const tr1Row = trRow[1].querySelectorAll('td');
-  tr1Row[6].classList.add('total_price_cms');
-  let totalPriceRow1 = tr1Row[6];
-  totalPriceRow1 = totalPriceRow1.textContent.replace('$', '');
-  
-  const tr2Row = trRow[2].querySelectorAll('td');
-  tr2Row[6].classList.add('total_price_cms');
-  let totalPriceRow2 = tr2Row[6];
-  totalPriceRow2 = totalPriceRow2.textContent.replace('$', '');
-  
-
-  return {
-    totalPriceRow1,
-    totalPriceRow2,
-  };
 };
 
 const typeFieldForm = () => {
@@ -294,17 +272,21 @@ const foo = () => {
   let totalPriceCms = document.querySelector('.cms__total-price');
   let priceByRowSum = document.querySelectorAll('.total_price_cms');
   let sum = 0;
-  priceByRowSum.forEach(e => console.log(sum += +e.textContent.replace('$', '')));
+  priceByRowSum.forEach(e => console.log(sum += +e.textContent));
 
   totalPriceCms.textContent = `$ ${sum}`;
 };
 
 const init = () => {
 
+const tr = document.querySelectorAll('tr');
+tr[1].remove();
+tr[2].remove();
+
 renderGoods(goodsArr);
+itemNumFoo();
 randomId();
 const {closeModal} = modalControl();
-addClassToCms();
 discountControl();
 const tBody = document.querySelector('.table__body');
 formControl(form, tBody, closeModal);
@@ -316,15 +298,3 @@ totalPriceCalc();
 }
 
 init();
-
-
-// 6. При открытии модального окна должен генерироваться случайный id и заполняться span с классом vendor-code__id
-
-// 7. Итоговая стоимость в модальном окне должна правильно высчитываться при смене фокуса
-
-// 8. Итоговая стоимость над таблицей должна корректно отображать сумму всех товаров
-
-
-
-// после реализации всех пунктов проверьте чтобы работало возможность удалить товар
-
