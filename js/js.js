@@ -8,7 +8,7 @@ const discountCheckBox = document.querySelector('.modal__checkbox');
 const overlayElem = document.querySelector('.overlay');
 overlayElem.classList.remove('active');
 
-const goodsArr = [
+let goodsArr = [
   {
     "id": 1,
     "title": "Смартфон Xiaomi 11T 8/128GB",
@@ -74,7 +74,7 @@ const itemNumFoo = () => {
   itemNumber.forEach(e => e.textContent = i++);
 };
 
-const createRow = ({id, title, category, units, count, price, images}) => {
+const createRow = ({id, title, category, units, count, price, discont, images}) => {
 
     const tr = document.createElement('tr');
 
@@ -114,8 +114,9 @@ const createRow = ({id, title, category, units, count, price, images}) => {
     itemPrice.insertAdjacentHTML('beforeend', `${price}`);
     price = itemPrice.innerHTML;
 
+    let priceSum = discont !== false ? count * price * (100 - discont) / 100 : count * price
+    console.log('priceSum: ', priceSum);
     itemSum.classList.add('table__cell');
-    const priceSum = count * price;
     itemSum.insertAdjacentText('beforeend', priceSum);
     itemSum.classList.add('total_price_cms')
 
@@ -148,10 +149,15 @@ const deleteRow = () => {
   const tBody = document.querySelector('.table__body')
   tBody.addEventListener('click', e => {
     const target = e.target;
-    if (e.target.closest('.table__btn.table__btn_del')) {
+    if (target.closest('.table__btn.table__btn_del')) {
+      const targetRow = target.closest('.row');
+      let targetRowId = targetRow.querySelector('td.table__cell_name');
+      targetRowId = targetRowId.dataset.id;
       target.closest('.row').remove();
-      foo();
+      goodsArr = goodsArr.filter(e => e.id != targetRowId);
+      totalPriceCms(goodsArr);
       itemNumFoo();
+      console.log('goodsArr: ', goodsArr);
     }
   });
   
@@ -225,7 +231,7 @@ form.addEventListener('submit', e => {
   addItemData(newItem);
   const tr = document.querySelectorAll('tr');
   tr.forEach(e => e.classList.add('row'));
-  foo();
+  totalPriceCms(goodsArr);
   form.reset();
   closeModal();
 });
@@ -248,26 +254,26 @@ const randomId = () => {
   return randomId;
 };
 
-const totalPriceCalc = () => {
-  let totalPriceForm = document.querySelector('.modal__total-price');
-  totalPriceForm.defaultValue = '$' + 0;
-  let priceForm = document.querySelector('#price');
-  priceForm = priceForm.value;
-  let countForm = document.querySelector('#count');
-  countForm = countForm.value;
+const totalPriceCalc = (price, count, totalPriceForm, discont) => {
+  // let totalPriceForm = document.querySelector('.modal__total-price');
+  
+  // let priceForm = document.querySelector('#price');
+  // price = price.value;
+  // let countForm = document.querySelector('#count');
+  // count = count.value;
   const input = document.querySelectorAll('.modal__input')
-  totalPriceForm.value = `$ ${countForm * priceForm}`;
+  totalPriceForm.value = `$ ${count * price * (100 - discont) / 100}`;
 
   input.forEach(e => 
     e.addEventListener('change', e => {
     totalPriceCalc()
     }));
 
-  foo();
+    totalPriceCms(goodsArr);
 
 };
 
-const foo = () => {
+const totalPriceCms = (goodsArr) => {
 
   let totalPriceCms = document.querySelector('.cms__total-price');
   let priceByRowSum = document.querySelectorAll('.total_price_cms');
@@ -278,22 +284,25 @@ const foo = () => {
 };
 
 const init = () => {
+const tBody = document.querySelector('.table__body');
 
-const tr = document.querySelectorAll('tr');
-tr[1].remove();
-tr[2].remove();
+let totalPriceForm = document.querySelector('.modal__total-price');
+console.log('totalPriceForm: ', totalPriceForm);
+totalPriceForm.defaultValue = '$' + 0;
+let price = document.querySelector('#price');
+let count = document.querySelector('#count');
+let discont = document.querySelector('#discount_count');
 
 renderGoods(goodsArr);
 itemNumFoo();
 randomId();
 const {closeModal} = modalControl();
 discountControl();
-const tBody = document.querySelector('.table__body');
 formControl(form, tBody, closeModal);
 typeFieldForm();
 deleteRow();
 
-totalPriceCalc();
+totalPriceCalc(price, count, totalPriceForm, discont);
 
 }
 
